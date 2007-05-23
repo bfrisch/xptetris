@@ -1,4 +1,9 @@
-package tetris;
+package gui;
+
+/**
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 2
+ */
 
 public class ColorUtil {
 	public static java.awt.Color randColor() {

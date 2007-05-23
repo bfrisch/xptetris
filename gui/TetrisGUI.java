@@ -1,7 +1,16 @@
-package tetris;
+package gui;
+
+/**
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 2
+ */
+
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
+
+import util.HighScores;
+
 import java.awt.*;
 
 public class TetrisGUI extends IntroCsApplication {
@@ -10,7 +19,7 @@ public class TetrisGUI extends IntroCsApplication {
 	StatusBar statusBar = new StatusBar("Game Now Being Played");
   
 	public void init() {
-		setTitle("Ben's XPTetris 2007");
+		setTitle("Ben's XPTetris 2007 0.1 Alpha 2");
 		add(tetrisComponent = new TetrisComponent());
 		addButtons(new String[]{"Pause/Play Game", "New Game", /*"Save Game", "Open Game",*/ "High Scores", "Exit"});
 		this.setJMenuBar(new MainMenu(this));
@@ -27,7 +36,7 @@ public class TetrisGUI extends IntroCsApplication {
 	
 	public void onButtonPressed(String label) {
 		if (label.equals("Exit")) {
-			this.dispose();
+			System.exit(1);
 		}
 		else if (label.equals("High Scores")) {
 			HighScores.showScores();
@@ -38,7 +47,7 @@ public class TetrisGUI extends IntroCsApplication {
 		else if (label.equals("Pause/Play Game")) {
 			getTetrisComponent().pauseGame();
 			if (getTetrisComponent().isPaused()) {
-				JOptionPane.showMessageDialog(this, "Tetris Game Pause", getTitle(), JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Tetris Game is now Paused", getTitle(), JOptionPane.INFORMATION_MESSAGE);
 				statusBar.setMessage("Game Paused");
 			}
 			else {
@@ -75,13 +84,13 @@ class MainMenu extends JMenuBar {
 	   
 	   private void processSelection(String selection){
 		   if (selection.equalsIgnoreCase("exit")) {
-			   parFrame.dispose();
+			   System.exit(1);
 		   }
 		   else if (selection.equalsIgnoreCase("help contents")) {
 			   new HelpWindow();
 		   }
 		   else if (selection.equalsIgnoreCase("about")) {
-			   JOptionPane.showMessageDialog(parFrame, parFrame.getTitle() + " (Xross Platform Tetris) - Copyright 2007 - Ben Inc.", parFrame.getTitle(), JOptionPane.INFORMATION_MESSAGE); 
+			   JOptionPane.showMessageDialog(parFrame, parFrame.getTitle() + " (Xross Platform Tetris) - Copyright 2007 - Ben Inc. - The Fictional Corporation of Benjamin Frisch", parFrame.getTitle(), JOptionPane.INFORMATION_MESSAGE); 
 		   }
 		   else if (selection.equals("New Game")) {
 			   parFrame.getTetrisComponent().init();

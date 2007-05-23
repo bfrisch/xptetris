@@ -1,12 +1,14 @@
-package tetris;
+package util;
+
+import gui.CenteredLabel;
+import gui.IntroCsApplication;
 
 import java.util.*;
 import javax.swing.*;
 
-
 /**
- * @author Ben
- *
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 2
  */
 public class HighScores {	
 	private static TreeSet highScores = null;

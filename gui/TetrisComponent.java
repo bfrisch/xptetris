@@ -1,8 +1,17 @@
-package tetris;
+package gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+
+import pieces.*;
+
+import util.HighScores;
+
+/**
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 2
+ */
 
 class TetrisComponent extends IntroCsComponent {
 	private static final long serialVersionUID = 1L;
@@ -19,7 +28,8 @@ class TetrisComponent extends IntroCsComponent {
 	
 	public TetrisComponent() {
 		super();
-		JOptionPane.showMessageDialog(this, "Welcome Ben's XPTetris 2007 Version 1.0 Alphra 2 RTC (Release To Class)\n Enjoy Your Game!\n\n\nKnown Bugs: Only one Piece has Rotation Enabled - Press Spacebar to Find Out (Also try Down, Left, and Right)\nPiece may ocassionally overlap another piece in special known situations.\n\nPlanned Features: Saving and Opening Of Games, Sound, Fall Speed Changing, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, Working Help\n\n- Ben Frisch", "Ben's XPTetris 2007", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Welcome Ben's XPTetris 2007 Version 0.1 Alpha 2 RTC (Release To Class)\n Enjoy Your Game!\n\n\nKnown Bugs: Piece may ocassionally overlap another piece in special known situations.\n\nPlanned Features: Saving and Opening Of Games, Sound, Fall Speed Changing, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, Working Help\n\n- Ben Frisch", "Ben's XPTetris 2007 0.1 Alpha 2", JOptionPane.INFORMATION_MESSAGE);
+		startTimer(500);
 		init();
 	}
 	
@@ -31,17 +41,18 @@ class TetrisComponent extends IntroCsComponent {
 		}
 		
 		score = 0;
+		
 		piece = new RightL(board, boardBackground);
+		nextPiece = new LeftL(board, boardBackground);
+		
 		gameInPlay = true;
 		gameBeingPlayed = true;
-		
-		startTimer(500);
 	}
 	
 	public void paintComponent(Graphics page) {
 		drawBoard(getWidth()/6 + ((getWidth() % 3)/2), 10 + (((2*getWidth()) % 3)/2), 2*getWidth()/3 - ((getWidth() % 3)/2), getHeight()-20, page);
 
-		nextPiece.nextPaint(10, 70, 20, 1, page);
+		nextPiece.nextPaint(2, 70, 20, 1, page);
 		piece.paint(getWidth()/6 + ((getWidth() % 3)/2), 10 + (((2*getWidth()) % 3)/2), 2*getWidth()/3 - ((getWidth() % 3)/2), getHeight()-20, offset, page);
 	}
 	
@@ -67,6 +78,10 @@ class TetrisComponent extends IntroCsComponent {
 		gameBeingPlayed = !gameBeingPlayed;
 	}
 	
+	public boolean gameIsOver() {
+		return gameInPlay;
+	}
+	
 	public Color getDefaultColor() {
 		return boardBackground;
 	}
@@ -87,18 +102,26 @@ class TetrisComponent extends IntroCsComponent {
 
 	public void onKeyPressed(KeyEvent e, int keyCode, char keyChar) {
 		if (gameBeingPlayed == true) {
-			if (keyCode == KeyEvent.VK_LEFT) {
+			switch (keyCode) {
+			case KeyEvent.VK_LEFT:
 				piece.moveLeft();
-			}
-			else if (keyCode == KeyEvent.VK_RIGHT) {
+				break;
+			case KeyEvent.VK_RIGHT:
 				piece.moveRight();
-			}
-			else if (keyCode == KeyEvent.VK_DOWN) {
+				break;
+			case KeyEvent.VK_DOWN:
 				piece.fall();
 				if (!piece.isInBoard()) score+=10;
-			}
-			else if (keyCode == KeyEvent.VK_SPACE) {
+				break;
+			case KeyEvent.VK_SPACE:
 				piece.rotate();
+				break;
+			case KeyEvent.VK_ENTER:
+				while (!piece.isInBoard()) {
+					piece.fall();
+					score+=10;
+				}
+				break;
 			}
 		}
 	}
@@ -125,7 +148,7 @@ class TetrisComponent extends IntroCsComponent {
 				piece = nextPiece;
 				java.util.Random rand = new java.util.Random();
 				
-				switch (rand.nextInt(7)) {
+				switch (rand.nextInt(8)) {
 					case 1:
 						nextPiece = new RightL(board, boardBackground);
 						break;
@@ -143,6 +166,9 @@ class TetrisComponent extends IntroCsComponent {
 						break;
 					case 6:
 						nextPiece = new LeftZigZag(board, boardBackground);
+						break;
+					case 7:
+						nextPiece = new TPiece(board, boardBackground);
 						break;
 				}
 				

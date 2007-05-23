@@ -1,4 +1,4 @@
-package tetris;
+package gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -13,7 +13,11 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-class IntroCsApplication extends JFrame {
+/**
+ * @author David Kosbie
+ */
+
+public class IntroCsApplication extends JFrame {
 	private static final long serialVersionUID = 1L;
   public void init() {
   	// override this method to add your buttons, objects, etc

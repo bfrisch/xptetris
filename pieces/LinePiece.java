@@ -1,4 +1,9 @@
-package tetris;
+package pieces;
+
+/**
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 2
+ */
 
 import java.awt.Color;
 
@@ -13,12 +18,10 @@ public class LinePiece extends Piece{
 	
 	public void rotate() {
 		if (pieceShape.length > 1) {
-			boolean[][] p = {{true,true,true,true}};
-			pieceShape = p;
+			pieceShape = new boolean[][]{{true,true,true,true}};
 		}
 		else {
-			boolean[][] p = {{true},{true},{true},{true}};
-			pieceShape = p;
+			pieceShape = new boolean[][]{{true},{true},{true},{true}};
 		}
 	}
 }
