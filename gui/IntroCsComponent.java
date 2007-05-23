@@ -1,4 +1,4 @@
-package tetris;
+package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -12,6 +12,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JComponent;
+
+/**
+ * @author David Kosbie
+ */
 
 class IntroCsComponent extends JComponent {
 	private static final long serialVersionUID = 1L;

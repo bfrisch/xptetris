@@ -1,4 +1,10 @@
-package tetris;
+package pieces;
+
+/**
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 2
+ */
+
 import java.awt.Color;
 import java.awt.Graphics;
 
@@ -109,20 +115,24 @@ public abstract class Piece {
 		//System.out.println(java.util.Arrays.toString(rowsToClear));
 		for (int i = 0; i < rowsToClear.length; i++) {
 			if (rowsToClear[i] == true) {
-				if (i + pieceRow > 0) {
-					for (int c = 0; c < board[0].length; c++) {
-						board[i + pieceRow][c] = board[i + pieceRow - 1][c]; 
-					}
-				}
-				else if (i + pieceRow == 0) {
-					for (int c = 0; c < board[0].length; c++) {
-						board[i + pieceRow][c] = boardBackground; 
-					}					
-				}
+				clearRow(i + pieceRow);
 			}
 		}
 	}
 	
+	private void clearRow(int rowToClear) {
+		if (rowToClear > 0) {
+			for (int c = 0; c < board[0].length; c++) {
+				board[rowToClear][c] = board[rowToClear - 1][c];			
+			}
+			clearRow(rowToClear - 1);
+		}
+		else if (rowToClear == 0) {
+			for (int c = 0; c < board[0].length; c++) {
+				board[0][c] = boardBackground; 
+			}					
+		}
+	}
 	public void rotate() {
 		rotationNum++;
 		if (rotationNum == arrayRotations.length) rotationNum = 0;
