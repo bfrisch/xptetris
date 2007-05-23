@@ -15,6 +15,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * @author David Kosbie
+ * @author Benjamin Frisch (Few Additonal Lines to Code of David Kosbie)* @author Benjamin Frisch (Few Additonal Lines to Code of David Kosbie)
  */
 
 public class IntroCsApplication extends JFrame {

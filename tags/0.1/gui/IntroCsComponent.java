@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 
 /**
  * @author David Kosbie
+ * @author Benjamin Frisch (Few Additonal Lines to Code of David Kosbie)
  */
 
 class IntroCsComponent extends JComponent {
