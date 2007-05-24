@@ -20,16 +20,15 @@ class TetrisComponent extends IntroCsComponent {
 	private static final int offset = 1;
 	private Color[][] board = new Color [20][10];
 	private int score = 0;
-	private Piece piece = new RightL(board, boardBackground);
-	private Piece nextPiece = new LeftL(board, boardBackground);
+	private Piece piece = getRandomNextPiece();
+	private Piece nextPiece = getRandomNextPiece();
 
 	private boolean gameInPlay = true;
 	private boolean gameBeingPlayed = true;
 	
 	public TetrisComponent() {
 		super();
-		JOptionPane.showMessageDialog(this, "Welcome Ben's XPTetris 2007 Version 0.1 Alpha 2 RTC (Release To Class)\n Enjoy Your Game!\n\n\nKnown Bugs: Piece may ocassionally overlap another piece in special known situations.\n\nPlanned Features: Saving and Opening Of Games, Sound, Fall Speed Changing, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, Working Help\n\n- Ben Frisch", "Ben's XPTetris 2007 0.1 Alpha 2", JOptionPane.INFORMATION_MESSAGE);
-		startTimer(500);
+		JOptionPane.showMessageDialog(this, "Welcome Ben's XPTetris 2007 Version 0.1 Alpha 3 RTC (Release To Class)\n Enjoy Your Game!\n\nPlanned Features: Saving and Opening Of Games, Sound, Fall Speed Changing, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, Working Help\n\n- Ben Frisch", "Ben's XPTetris 2007 0.1 Alpha 3", JOptionPane.INFORMATION_MESSAGE);		startTimer(500);
 		init();
 	}
 	
@@ -42,8 +41,8 @@ class TetrisComponent extends IntroCsComponent {
 		
 		score = 0;
 		
-		piece = new RightL(board, boardBackground);
-		nextPiece = new LeftL(board, boardBackground);
+		piece = getRandomNextPiece();
+		nextPiece = getRandomNextPiece();
 		
 		gameInPlay = true;
 		gameBeingPlayed = true;
@@ -144,41 +143,12 @@ class TetrisComponent extends IntroCsComponent {
 				gameInPlay = false;
 			}
 			else if (piece.isInBoard()) {
-				score = score + (45/piece.getRows()) ;
+				score += (45/piece.getRows()) + 20*piece.getNumRowsFilled();
 				piece = nextPiece;
-				java.util.Random rand = new java.util.Random();
 				
-				switch (rand.nextInt(8)) {
-					case 1:
-						nextPiece = new RightL(board, boardBackground);
-						break;
-					case 2:
-						nextPiece = new SquarePiece(board, boardBackground);
-						break;
-					case 3:
-						nextPiece = new LeftL(board, boardBackground);
-						break;
-					case 4:
-						nextPiece = new LinePiece(board, boardBackground);
-						break;
-					case 5:
-						nextPiece = new RightZigZag(board, boardBackground);
-						break;
-					case 6:
-						nextPiece = new LeftZigZag(board, boardBackground);
-						break;
-					case 7:
-						nextPiece = new TPiece(board, boardBackground);
-						break;
-				}
+				nextPiece = getRandomNextPiece();
 				
-				/*try {
-					piece = Piece.class.newInstance();
-				} catch (InstantiationException e) {
-					JOptionPane.showMessageDialog(this, "Big Huge Error! - Fix It Ben!");
-				} catch (IllegalAccessException e) {
-					JOptionPane.showMessageDialog(this, "Big Huge Error! - Fix it Ben!");
-				}*/			
+				
 			}
 			else {
 				piece.fall();
@@ -186,5 +156,28 @@ class TetrisComponent extends IntroCsComponent {
 		}
 	}
 
+	private Piece getRandomNextPiece() {
+
+		java.util.Random rand = new java.util.Random();
+		
+		switch (rand.nextInt(8)) {
+			case 1:
+				return new RightL(board, boardBackground);
+			case 2:
+				return new SquarePiece(board, boardBackground);
+			case 3:
+				return new LeftL(board, boardBackground);
+			case 4:
+				return new LinePiece(board, boardBackground);
+			case 5:
+				return new RightZigZag(board, boardBackground);
+			case 6:
+				return new LeftZigZag(board, boardBackground);
+			case 7:
+				return new TPiece(board, boardBackground);
+			default:
+				return null;
+		}
+	}
 	public void onResized() {repaint();} 
 }

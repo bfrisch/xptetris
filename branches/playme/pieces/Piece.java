@@ -18,6 +18,8 @@ public abstract class Piece {
 	private boolean noFallAllowed = false;
 	protected boolean[][][] arrayRotations;
 	
+	private int rowsFilled = 0;
+	
 	public Piece(Color[][] board, Color boardBackground) {
 		this.boardBackground = boardBackground;
 		pieceRow = -1 * (pieceShape.length - 1);
@@ -26,7 +28,7 @@ public abstract class Piece {
 	}
 	
 	public void fall() {
-		if (boardIsAboveOtherPieces()) {
+		if (pieceIsDirectlyAboveOtherPieces()) {
 			if (pieceRow > 0) {
 				addPieceToBoard();
 				clearNewFilledRow();
@@ -48,7 +50,7 @@ public abstract class Piece {
 		}
 	}
 	
-	public boolean boardIsAboveOtherPieces() {
+	public boolean pieceIsDirectlyAboveOtherPieces() {
 		for (int r = pieceShape.length - 1; r >= 0; r--) {
 			for (int c = 0; c < pieceShape[pieceShape.length -1].length; c++) {
 				if (pieceRow + pieceShape.length >= 0 && pieceCol + c >= 0 && pieceRow + pieceShape.length != board.length) {
@@ -115,6 +117,7 @@ public abstract class Piece {
 		//System.out.println(java.util.Arrays.toString(rowsToClear));
 		for (int i = 0; i < rowsToClear.length; i++) {
 			if (rowsToClear[i] == true) {
+				rowsFilled++;
 				clearRow(i + pieceRow);
 			}
 		}
@@ -158,7 +161,7 @@ public abstract class Piece {
 	public boolean boardIsDirectlyLeftOfOtherPieces() {
 		for (int r = pieceShape.length - 1; r >= 0; r--) {
 			for (int c = 0; c < pieceShape[pieceShape.length -1].length; c++) {
-				if (pieceRow + pieceShape.length >= 0 && pieceCol + c >= 0 && pieceRow + pieceShape.length != board.length) {
+				if ((pieceCol + c - 1) >= 0) {
 					if (!board[pieceRow + r][pieceCol + c - 1].equals(boardBackground)) {
 						if (pieceShape[r][c] == true) {
 							return true;
@@ -181,11 +184,9 @@ public abstract class Piece {
 	public boolean boardIsDirectlyRightOfOtherPieces() {
 		for (int r = pieceShape.length - 1; r >= 0; r--) {
 			for (int c = 0; c < pieceShape[pieceShape.length -1].length; c++) {
-				if (pieceRow + pieceShape.length >= 0 && pieceCol + c >= 0 && pieceRow + pieceShape.length != board.length) {
-					if (!board[pieceRow + r][pieceCol + c + 1].equals(boardBackground)) {
-						if (pieceShape[r][c] == true) {
-							return true;
-						}
+				if (!board[pieceRow + r][pieceCol + c + 1].equals(boardBackground)) {
+					if (pieceShape[r][c] == true) {
+						return true;
 					}
 				}
 			}	
@@ -196,5 +197,9 @@ public abstract class Piece {
 	
 	public int getRows() {
 		return board.length;
+	}
+	
+	public int getNumRowsFilled() {
+		return rowsFilled;
 	}
 }

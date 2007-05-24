@@ -19,7 +19,7 @@ public class TetrisGUI extends IntroCsApplication {
 	StatusBar statusBar = new StatusBar("Game Now Being Played");
   
 	public void init() {
-		setTitle("Ben's XPTetris 2007 0.1 Alpha 2");
+		setTitle("Ben's XPTetris 2007 0.1 Alpha 3");
 		add(tetrisComponent = new TetrisComponent());
 		addButtons(new String[]{"Pause/Play Game", "New Game", /*"Save Game", "Open Game",*/ "High Scores", "Exit"});
 		this.setJMenuBar(new MainMenu(this));
