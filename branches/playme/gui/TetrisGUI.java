@@ -203,39 +203,3 @@ class StatusBar extends JLabel {
         setText(" "+message);        
     }        
 }
-
-class ColorPicker {
-	Color selected = null;
-	  public ColorPicker(JFrame owner) {
-	    final JDialog frame = new JDialog(owner, "JColorChooser Popup", true);
-	    frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-	    Container contentPane = frame.getContentPane();
-
-	    final JLabel label = new JLabel("I Love Swing", JLabel.CENTER);
-	    label.setFont(new Font("Serif", Font.BOLD | Font.ITALIC, 48));
-	    contentPane.add(label, BorderLayout.SOUTH);
-
-	    final JColorChooser colorChooser = new JColorChooser(label
-	        .getBackground());
-	    colorChooser.setBorder(BorderFactory
-	        .createTitledBorder("Pick Foreground Color"));
-
-	    javax.swing.colorchooser.ColorSelectionModel model = colorChooser.getSelectionModel();
-	    ChangeListener changeListener = new ChangeListener() {
-	      public void stateChanged(ChangeEvent changeEvent) {
-	        Color newForegroundColor = colorChooser.getColor();
-	        label.setForeground(newForegroundColor);
-	        selected = newForegroundColor;
-	      }
-	    };
-	    model.addChangeListener(changeListener);
-	    contentPane.add(colorChooser, BorderLayout.CENTER);
-
-	    frame.pack();
-	    frame.setVisible(true);
-	  }
-	  
-	  public Color getSelectedColor() {
-		  return selected;
-	  }
-	}
