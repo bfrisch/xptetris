@@ -2,14 +2,14 @@ package pieces;
 
 /**
  * @author Benjamin Frisch
- * @version 0.1 Alpha 2
+ * @version 0.1 Alpha 4
  */
 
 import java.awt.Color;
 
 public class LeftL extends Piece{
-	public LeftL(Color[][] board, Color boardBackground) {
-		super(board, boardBackground);
+	public LeftL(Color[][] board) {
+		super(board);
 		arrayRotations = new boolean[][][]{
 			{{false, false, true},
 			 {true, true, true}},

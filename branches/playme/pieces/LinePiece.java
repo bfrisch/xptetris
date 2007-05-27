@@ -9,20 +9,16 @@ import java.awt.Color;
 
 public class LinePiece extends Piece{
 	
-	public LinePiece(Color[][] board, Color boardBackground) {
-		super(board, boardBackground);
-		boolean[][] p = {{true},{true},{true},{true}};
-		pieceShape = p;
+	public LinePiece(Color[][] board) {
+		super(board);
+		arrayRotations = new boolean[][][]{
+				{{true},{true},{true},{true}},
+				{{true,true,true,true}}
+				
+		};
+		
+		pieceShape = arrayRotations[0];
 		pieceColor = Color.cyan;
-	}
-	
-	public void rotate() {
-		if (pieceShape.length > 1) {
-			pieceShape = new boolean[][]{{true,true,true,true}};
-		}
-		else {
-			pieceShape = new boolean[][]{{true},{true},{true},{true}};
-		}
 	}
 }
 

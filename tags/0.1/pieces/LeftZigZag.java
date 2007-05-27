@@ -8,8 +8,8 @@ package pieces;
 import java.awt.Color;
 
 public class LeftZigZag extends Piece{
-	public LeftZigZag(Color[][] board, Color boardBackground) {
-		super(board, boardBackground);
+	public LeftZigZag(Color[][] board) {
+		super(board);
 		arrayRotations = new boolean[][][] {
 			{{true, true, false},
         	 {false, true, true}},

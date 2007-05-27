@@ -1,20 +1,14 @@
 package pieces;
-
-/**
- * @author Benjamin Frisch
- * @version 1.0 RTC
- */
-
 import java.awt.Color;
 
 /**
  * @author Benjamin Frisch
- * @version 0.1 Alpha 2
+ * @version 0.1 Alpha 4
  */
 
 public class TPiece extends Piece {
-	public TPiece(Color[][] board, Color boardBackground) {
-		super(board, boardBackground);
+	public TPiece(Color[][] board) {
+		super(board);
 		arrayRotations = new boolean[][][] {
 			{{false, true, false},
         	 {true, true, true}},

@@ -9,13 +9,13 @@ import java.awt.Color;
 
 public class SquarePiece extends Piece{
 	
-	public SquarePiece(Color[][] board, Color boardBackground) {
-		super(board, boardBackground);
-		boolean[][] p = {
+	public SquarePiece(Color[][] board) {
+		super(board);
+		
+		pieceShape = new boolean[][] {
 				{true, true},
 				{true, true}
 		};
-		pieceShape = p;
 		pieceColor = Color.yellow;
 	}
 	
