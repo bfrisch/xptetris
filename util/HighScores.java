@@ -1,10 +1,10 @@
 package util;
 
-import gui.CenteredLabel;
-import gui.IntroCsApplication;
-
 import java.util.*;
 import javax.swing.*;
+
+import xpn.XPnCenteredLabel;
+import xpn.XPnDialog;
 
 /**
  * @author Benjamin Frisch
@@ -64,7 +64,7 @@ public class HighScores {
 		return numScores;
 	}
 }
-class HighScoreWindow extends IntroCsApplication {
+class HighScoreWindow extends XPnDialog {
 	private static final long serialVersionUID = 1L;
 	private TreeSet highScores = HighScores.getPastHighScores();
 		
@@ -73,7 +73,7 @@ class HighScoreWindow extends IntroCsApplication {
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		add(new JLabel(" "));
-		add(new CenteredLabel("High Scores"));
+		add(new XPnCenteredLabel("High Scores"));
 		add(new JLabel(" "));
 		
 		if (highScores.size() > 0) {
@@ -82,7 +82,7 @@ class HighScoreWindow extends IntroCsApplication {
 			for (i = 1; i <= 10; i++) {
 				if (highScoreIt.hasNext()) {
 					ScoreData score = (ScoreData) highScoreIt.next();
-					add(new CenteredLabel(i + ". " + score.getName() + " : " + score.getScore()));
+					add(new XPnCenteredLabel(i + ". " + score.getName() + " : " + score.getScore()));
 				}
 				else {
 					break;
@@ -90,14 +90,14 @@ class HighScoreWindow extends IntroCsApplication {
 			}
 			
 			for (; i <=10; i++) {
-				add(new CenteredLabel(i + ". "));
+				add(new XPnCenteredLabel(i + ". "));
 			}
 			
 			add(new JLabel(" "));
 			addButtons(new String[]{"   Clear Scores   ", "   Close   "});
 		}
 		else {
-			add (new CenteredLabel("No High Scores"));
+			add (new XPnCenteredLabel("No High Scores"));
 			add(new JLabel(" "));
 			addButtons(new String[]{"      Close     "});
 		}
