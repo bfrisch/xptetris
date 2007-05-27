@@ -5,47 +5,56 @@ import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
 import pieces.*;
+import xpn.*;
 
 import util.HighScores;
 
 /**
  * @author Benjamin Frisch
- * @version 0.1 Alpha 2
+ * @version 0.1 Alpha 4
  */
 
-class TetrisComponent extends IntroCsComponent {
-	private static final long serialVersionUID = 1L;
+class TetrisComponent extends XPnComponent implements XPnTimerHandler {
+	private static final long serialVersionUID = -7820551496471765983L;
+	
+	public Color[][] board = new Color[20][10];
 	private static final Color boardBackground = Color.lightGray,
 		boardBorder = Color.black;
-	private static final int offset = 1;
-	private Color[][] board = new Color [20][10];
-	private int score = 0;
-	private Piece piece = getRandomNextPiece();
-	private Piece nextPiece = getRandomNextPiece();
 
-	private boolean gameInPlay = true;
-	private boolean gameBeingPlayed = true;
+	public static final int offset = 1;
+	public int score = 0;
+	public Piece piece = getRandomNextPiece();
+	public Piece nextPiece = getRandomNextPiece();
+	private boolean gamePaused = false;
 	
+	private XPnTimer timer = new XPnTimer(this);
+
 	public TetrisComponent() {
 		super();
-		JOptionPane.showMessageDialog(this, "Welcome Ben's XPTetris 2007 Version 0.1 Alpha 3 RTC (Release To Class)\n Enjoy Your Game!\n\nPlanned Features: Saving and Opening Of Games, Sound, Fall Speed Changing, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, Working Help\n\n- Ben Frisch", "Ben's XPTetris 2007 0.1 Alpha 3", JOptionPane.INFORMATION_MESSAGE);		startTimer(500);
+		
+		JOptionPane.showMessageDialog(this, "Welcome to " + Strings.title + "\nEnjoy Your Game!\n\nPlanned Features: Saving and Opening Of Games, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, \n\n- Ben Frisch", Strings.title, JOptionPane.INFORMATION_MESSAGE);
+		
 		init();
 	}
 	
 	public void init() {
-		for (int row = 0; row < board.length; row++) {
-			for (int col = 0; col < board[0].length; col++) {
-				board[row][col] = boardBackground;
-			}
-		}
+		timer.start(500);
+	}
+	
+	public void reset() {
+		timer.stop();
+		timer.start(500);
 		
-		score = 0;
+		board = new Color[20][10];
 		
 		piece = getRandomNextPiece();
 		nextPiece = getRandomNextPiece();
 		
-		gameInPlay = true;
-		gameBeingPlayed = true;
+		repaint();
+	}
+	
+	public void doNothingOnTimer() {
+		timer.stop();
 	}
 	
 	public void paintComponent(Graphics page) {
@@ -63,7 +72,12 @@ class TetrisComponent extends IntroCsComponent {
 			for (int col = 0; col < board[0].length; col++) {
 				page.setColor(boardBorder);
 				page.fillRect(col*(boardWidth/board[0].length) + boardX,row*(boardHeight/board.length) + boardY, boardWidth/board[0].length,boardHeight/board.length);
-				page.setColor(board[row][col]);
+				if (board[row][col] != null) {
+					page.setColor(board[row][col]);
+				}
+				else {
+					page.setColor(boardBackground);
+				}
 				page.fillRect(col*(boardWidth/board[0].length) + boardX + offset,row*(boardHeight/board.length) + offset + boardY, (boardWidth/board[0].length) - (offset*2),(boardHeight/board.length) - (offset*2));
 			}
 		}
@@ -74,19 +88,26 @@ class TetrisComponent extends IntroCsComponent {
 	}
 	
 	public void pauseGame() {
-		gameBeingPlayed = !gameBeingPlayed;
+		gamePaused = !gamePaused;
+		if (!gameIsOver()) {
+			if (timer.isRunning()) {
+				timer.stop();
+			}
+			else {
+				timer.start();
+			}
+		}
+		else {
+			timer.stop();
+		}
 	}
 	
 	public boolean gameIsOver() {
-		return gameInPlay;
-	}
-	
-	public Color getDefaultColor() {
-		return boardBackground;
+		return piece.gameIsLost();
 	}
 	
 	public boolean isPaused() {
-		return !gameBeingPlayed;
+		return gamePaused || gameIsOver();
 	}
 	  
 	////////////////////////////////////////////
@@ -100,7 +121,7 @@ class TetrisComponent extends IntroCsComponent {
 	public void onMouseReleased(int x, int y) { }
 
 	public void onKeyPressed(KeyEvent e, int keyCode, char keyChar) {
-		if (gameBeingPlayed == true) {
+		if (!isPaused()) {
 			switch (keyCode) {
 			case KeyEvent.VK_LEFT:
 				piece.moveLeft();
@@ -120,39 +141,45 @@ class TetrisComponent extends IntroCsComponent {
 					piece.fall();
 					score+=10;
 				}
+				onTimer();
 				break;
 			}
 		}
 	}
-
-	private int getScore() {
-		return score;
+	
+	public xpn.XPnTimer getTimer() {
+		return timer;
 	}
 	
-	public void onTimer() {
-		if (gameBeingPlayed == true) {			
-			if (piece.gameIsLost() && gameInPlay == true) {
-				if (HighScores.getLowestHighScore() < this.getScore() || (HighScores.getNumScores() < 10 && (this.getScore() == HighScores.getLowestHighScore()))) {
+	public void onTimer() {		
+		if (!isPaused()) {
+			if (piece.gameIsLost()) {
+				((TetrisGUI)this.getRootPane().getParent()).statusBar.setMessage("Game Over");
+				timer.stop();
+				
+				if (HighScores.getLowestHighScore() < score || (HighScores.getNumScores() < 10 && (this.score == HighScores.getLowestHighScore()))) {
 					String name = JOptionPane.showInputDialog(this, "Congratulations! You got a high score!\nEnter your name:\n\nPress cancel to hide your high score", "Ben's XPTetris 2007", JOptionPane.QUESTION_MESSAGE);
 					if (name != null) {
-						HighScores.add(name, getScore());
+						HighScores.add(name, score);
 						HighScores.showScores();
 					}
 				}
-				gameBeingPlayed = false;
-				gameInPlay = false;
 			}
 			else if (piece.isInBoard()) {
+				if (piece.getNumRowsFilled() > 0) {
+					XPnSound.beep();
+				}
+				
 				score += (45/piece.getRows()) + 20*piece.getNumRowsFilled();
 				piece = nextPiece;
 				
 				nextPiece = getRandomNextPiece();
-				
-				
 			}
 			else {
 				piece.fall();
 			}
+			
+			repaint();
 		}
 	}
 
@@ -160,24 +187,29 @@ class TetrisComponent extends IntroCsComponent {
 
 		java.util.Random rand = new java.util.Random();
 		
-		switch (rand.nextInt(8)) {
+		switch (rand.nextInt(7)) {
+			case 0:
+				return new RightL(board);
 			case 1:
-				return new RightL(board, boardBackground);
+				return new SquarePiece(board);
 			case 2:
-				return new SquarePiece(board, boardBackground);
+				return new LeftL(board);
 			case 3:
-				return new LeftL(board, boardBackground);
+				return new LinePiece(board);
 			case 4:
-				return new LinePiece(board, boardBackground);
+				return new RightZigZag(board);
 			case 5:
-				return new RightZigZag(board, boardBackground);
+				return new LeftZigZag(board);
 			case 6:
-				return new LeftZigZag(board, boardBackground);
-			case 7:
-				return new TPiece(board, boardBackground);
+				return new TPiece(board);
 			default:
-				return null;
+				throw new java.lang.RuntimeException("Invalid next int");
 		}
 	}
-	public void onResized() {repaint();} 
+	
+	public void onResized() {repaint();}
+	
+	
+
 }
+
