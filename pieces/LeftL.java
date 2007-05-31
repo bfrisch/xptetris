@@ -25,8 +25,6 @@ public class LeftL extends Piece{
 			 {false, true},
 			 {false, true}},
 		};
-		
-		pieceShape = arrayRotations[0];
 		pieceColor = Color.orange;
 	}
 }

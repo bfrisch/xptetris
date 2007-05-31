@@ -8,10 +8,11 @@ import pieces.*;
 import xpn.*;
 
 import util.HighScores;
+import util.Messages;
 
 /**
  * @author Benjamin Frisch
- * @version 0.1 Alpha 4
+ * @version 0.9 Alpha 5
  */
 
 class TetrisComponent extends XPnComponent implements XPnTimerHandler {
@@ -32,7 +33,7 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	public TetrisComponent() {
 		super();
 		
-		JOptionPane.showMessageDialog(this, "Welcome to " + Strings.title + "\nEnjoy Your Game!\n\nPlanned Features: Saving and Opening Of Games, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, \n\n- Ben Frisch", Strings.title, JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Welcome to " + Messages.getString("title") + " " + Messages.getString("version") + "\nEnjoy Your Game!\n\nPlanned Features: Saving and Opening Of Games, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, \n\n- Ben Frisch", Messages.getString("title") + " " + Messages.getString("version"), JOptionPane.INFORMATION_MESSAGE);
 		
 		init();
 	}
@@ -50,6 +51,8 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		piece = getRandomNextPiece();
 		nextPiece = getRandomNextPiece();
 		
+		gamePaused = false;
+		
 		repaint();
 	}
 	
@@ -60,7 +63,7 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	public void paintComponent(Graphics page) {
 		drawBoard(getWidth()/6 + ((getWidth() % 3)/2), 10 + (((2*getWidth()) % 3)/2), 2*getWidth()/3 - ((getWidth() % 3)/2), getHeight()-20, page);
 
-		nextPiece.nextPaint(2, 70, 20, 1, page);
+		nextPiece.paintAsNextPiece(2, 70, 20, 1, page);
 		piece.paint(getWidth()/6 + ((getWidth() % 3)/2), 10 + (((2*getWidth()) % 3)/2), 2*getWidth()/3 - ((getWidth() % 3)/2), getHeight()-20, offset, page);
 	}
 	
@@ -89,7 +92,7 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	
 	public void pauseGame() {
 		gamePaused = !gamePaused;
-		if (!gameIsOver()) {
+		if (!gameOver()) {
 			if (timer.isRunning()) {
 				timer.stop();
 			}
@@ -102,12 +105,12 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		}
 	}
 	
-	public boolean gameIsOver() {
-		return piece.gameIsLost();
+	public boolean gameOver() {
+		return piece.gameOver();
 	}
 	
 	public boolean isPaused() {
-		return gamePaused || gameIsOver();
+		return gamePaused || gameOver();
 	}
 	  
 	////////////////////////////////////////////
@@ -137,7 +140,7 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 				piece.rotate();
 				break;
 			case KeyEvent.VK_ENTER:
-				while (!piece.isInBoard()) {
+				while (!piece.isInBoard() && !piece.gameOver()) {
 					piece.fall();
 					score+=10;
 				}
@@ -151,26 +154,27 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		return timer;
 	}
 	
-	public void onTimer() {		
-		if (!isPaused()) {
-			if (piece.gameIsLost()) {
-				((TetrisGUI)this.getRootPane().getParent()).statusBar.setMessage("Game Over");
-				timer.stop();
-				
-				if (HighScores.getLowestHighScore() < score || (HighScores.getNumScores() < 10 && (this.score == HighScores.getLowestHighScore()))) {
-					String name = JOptionPane.showInputDialog(this, "Congratulations! You got a high score!\nEnter your name:\n\nPress cancel to hide your high score", "Ben's XPTetris 2007", JOptionPane.QUESTION_MESSAGE);
-					if (name != null) {
-						HighScores.add(name, score);
-						HighScores.showScores();
-					}
+	public void onTimer() {
+		if (gameOver() && !gamePaused) {
+			((TetrisGUI)this.getRootPane().getParent()).statusBar.setMessage("Game Over");
+			timer.stop();
+			
+			if (HighScores.getLowestHighScore() < score || (HighScores.getNumScores() < 10 && (this.score == HighScores.getLowestHighScore()))) {
+				String name = JOptionPane.showInputDialog(this, "Congratulations! You got a high score!\nEnter your name:\n\nPress cancel to hide your high score", "Ben's XPTetris 2007", JOptionPane.QUESTION_MESSAGE);
+				if (name != null) {
+					HighScores.add(name, score);
+					HighScores.showScores();
 				}
 			}
-			else if (piece.isInBoard()) {
+			gamePaused = true;
+		}
+		if (!isPaused()) {
+			if (piece.isInBoard()) {
 				if (piece.getNumRowsFilled() > 0) {
 					XPnSound.beep();
 				}
 				
-				score += (45/piece.getRows()) + 20*piece.getNumRowsFilled();
+				score += (45/piece.getPieceShapeRows()) + 20*piece.getNumRowsFilled();
 				piece = nextPiece;
 				
 				nextPiece = getRandomNextPiece();
