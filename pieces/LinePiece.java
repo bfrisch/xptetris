@@ -17,7 +17,6 @@ public class LinePiece extends Piece{
 				
 		};
 		
-		pieceShape = arrayRotations[0];
 		pieceColor = Color.cyan;
 	}
 }

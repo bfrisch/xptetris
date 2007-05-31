@@ -26,7 +26,7 @@ public class RightL extends Piece{
 			 {false, true},
 			 {true, true}},
 		};
-		pieceShape = arrayRotations[0];
 		pieceColor = Color.blue;
+		
 	}
 }

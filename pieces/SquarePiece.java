@@ -12,9 +12,9 @@ public class SquarePiece extends Piece{
 	public SquarePiece(Color[][] board) {
 		super(board);
 		
-		pieceShape = new boolean[][] {
-				{true, true},
-				{true, true}
+		arrayRotations = new boolean[][][] {
+				{{true, true},
+				{true, true}}
 		};
 		pieceColor = Color.yellow;
 	}

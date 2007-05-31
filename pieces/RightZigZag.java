@@ -22,7 +22,6 @@ public class RightZigZag extends Piece{
 			{false, true}}
 		};
 		
-		pieceShape = arrayRotations[0];
 		pieceColor = Color.green;
 	}
 }

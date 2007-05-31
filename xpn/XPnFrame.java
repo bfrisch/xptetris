@@ -20,6 +20,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class XPnFrame extends JFrame {
 	private static final long serialVersionUID = 4387726429177330603L;
+	
+	private boolean autoShowWindow = true;
 
 public void init() {
   	// override this method to add your buttons, objects, etc
@@ -56,8 +58,10 @@ public void init() {
 	  			// send key events to this component!
   				focusComponent.requestFocusInWindow();
 		  	
-			setVisible(true);
-			setPreferredSize(null);
+			if (autoShowWindow) {
+				setVisible(true);
+				setPreferredSize(null);
+			}
 		}
  	});
   }
@@ -97,4 +101,8 @@ public void init() {
   	}
   	this.getContentPane().add(buttons);
   } 
+  
+  public void dontAutoShowWindow() {
+	  autoShowWindow = false;
+  }
 }
