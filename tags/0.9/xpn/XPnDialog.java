@@ -1,26 +1,29 @@
-package gui;
+package xpn;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * @author David Kosbie
- * @author Benjamin Frisch (Few Additonal Lines to Code of David Kosbie)
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 4
  */
 
-public class IntroCsApplication extends JFrame {
-	private static final long serialVersionUID = 1L;
-  public void init() {
+public class XPnDialog extends JDialog {
+	private static final long serialVersionUID = -2898862000185257817L;
+	
+	private boolean autoShowDialog = true;
+
+public void init() {
   	// override this method to add your buttons, objects, etc
   }
 
@@ -32,19 +35,28 @@ public class IntroCsApplication extends JFrame {
   	return this.getClass().getName();
   }
 
-  public IntroCsApplication() {
+  public XPnDialog() {
   	super();
+  	privateInit();
+  }
+  
+  public XPnDialog(javax.swing.JFrame frame) {
+	  	super(frame);
+	  	privateInit();
+	  }
+  
+  private void privateInit() {
   	try {
   	    UIManager.setLookAndFeel(
   	        UIManager.getSystemLookAndFeelClassName());
   	} catch (UnsupportedLookAndFeelException ex) {
-  	  System.out.println("Unable to load native look and feel");
+  	  System.err.println("Unable to load native look and feel");
   	}
   	catch (Exception e) {};
     Container cp = this.getContentPane();
   	cp.setBackground(Color.white);
 	cp.setLayout(new BoxLayout(cp,BoxLayout.Y_AXIS));
-    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     // use invokeLater to allow instance variables (like buttonLabels[])
     // to be initialized in subclasses before calling init() method
  	javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -56,19 +68,21 @@ public class IntroCsApplication extends JFrame {
 	  			// send key events to this component!
   				focusComponent.requestFocusInWindow();
 		  	
-			setVisible(true);
+			if (autoShowDialog) {
+				setVisible(true);
+			}
 		}
  	});
   }
   
-  private IntroCsComponent focusComponent = null;
+  private XPnComponent focusComponent = null;
   
   public Component add(Component c) {
   	Component result = super.add(c);
-  	if (c instanceof IntroCsComponent) {
+  	if (c instanceof XPnComponent) {
   		// the first one added gets the keyboard by default
   		if (focusComponent == null) {
-  			focusComponent = (IntroCsComponent) c;
+  			focusComponent = (XPnComponent) c;
   			// send key events to this component!
   			focusComponent.requestFocusInWindow();
   		}
@@ -97,21 +111,7 @@ public class IntroCsApplication extends JFrame {
   	this.getContentPane().add(buttons);
   }
   
-  public void beep() {
-	Toolkit.getDefaultToolkit().beep();
+  public void dontAutoShowDialog() {
+	  autoShowDialog = false;
   }
-
-  public void startTimer(final int timerDelay) { 
-    // use invokeLater to allow window to become visible before starting
-    // to be initialized in subclasses before calling init() method
- 	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    new javax.swing.Timer(timerDelay, new ActionListener() {
-		      public void actionPerformed(ActionEvent evt) {
-		        onTimer();
-		      }
-		    }).start();
-		}
- 	});
- }  
 }

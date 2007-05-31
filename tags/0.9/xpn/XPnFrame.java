@@ -1,8 +1,7 @@
-package gui;
+package xpn;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,16 +14,18 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * @author David Kosbie
- * @author Benjamin Frisch (Few Additonal Lines to Code of David Kosbie)
+ * @author Benjamin Frisch
+ * @version 0.1 Alpha 4
  */
 
-public class IntroCsApplication extends JFrame {
-	private static final long serialVersionUID = 1L;
-  public void init() {
+public class XPnFrame extends JFrame {
+	private static final long serialVersionUID = 4387726429177330603L;
+	
+	private boolean autoShowWindow = true;
+
+public void init() {
   	// override this method to add your buttons, objects, etc
   }
-
-  public void onTimer() { }  
 
   // This method lives outside the anonymous inner class Runnable
   // so that getClass() returns this class (in fact, the overridden subclass)  
@@ -32,7 +33,7 @@ public class IntroCsApplication extends JFrame {
   	return this.getClass().getName();
   }
 
-  public IntroCsApplication() {
+  public XPnFrame() {
   	super();
   	try {
   	    UIManager.setLookAndFeel(
@@ -45,6 +46,7 @@ public class IntroCsApplication extends JFrame {
   	cp.setBackground(Color.white);
 	cp.setLayout(new BoxLayout(cp,BoxLayout.Y_AXIS));
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    this.setPreferredSize(new java.awt.Dimension(500, 500));
     // use invokeLater to allow instance variables (like buttonLabels[])
     // to be initialized in subclasses before calling init() method
  	javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -56,19 +58,22 @@ public class IntroCsApplication extends JFrame {
 	  			// send key events to this component!
   				focusComponent.requestFocusInWindow();
 		  	
-			setVisible(true);
+			if (autoShowWindow) {
+				setVisible(true);
+				setPreferredSize(null);
+			}
 		}
  	});
   }
   
-  private IntroCsComponent focusComponent = null;
+  private XPnComponent focusComponent = null;
   
   public Component add(Component c) {
   	Component result = super.add(c);
-  	if (c instanceof IntroCsComponent) {
+  	if (c instanceof XPnComponent) {
   		// the first one added gets the keyboard by default
   		if (focusComponent == null) {
-  			focusComponent = (IntroCsComponent) c;
+  			focusComponent = (XPnComponent) c;
   			// send key events to this component!
   			focusComponent.requestFocusInWindow();
   		}
@@ -95,23 +100,9 @@ public class IntroCsApplication extends JFrame {
   		buttons.add(button);
   	}
   	this.getContentPane().add(buttons);
-  }
+  } 
   
-  public void beep() {
-	Toolkit.getDefaultToolkit().beep();
+  public void dontAutoShowWindow() {
+	  autoShowWindow = false;
   }
-
-  public void startTimer(final int timerDelay) { 
-    // use invokeLater to allow window to become visible before starting
-    // to be initialized in subclasses before calling init() method
- 	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    new javax.swing.Timer(timerDelay, new ActionListener() {
-		      public void actionPerformed(ActionEvent evt) {
-		        onTimer();
-		      }
-		    }).start();
-		}
- 	});
- }  
 }

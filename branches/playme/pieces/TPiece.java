@@ -23,9 +23,7 @@ public class TPiece extends Piece {
 		     {{false, true},
 		      {true,  true},	  
 		      {false, true}}
-		};		
-		
-		pieceShape = arrayRotations[0];
+		};
 		pieceColor = Color.magenta;
 	}
 }

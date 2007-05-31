@@ -20,6 +20,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class XPnDialog extends JDialog {
 	private static final long serialVersionUID = -2898862000185257817L;
+	
+	private boolean autoShowDialog = true;
 
 public void init() {
   	// override this method to add your buttons, objects, etc
@@ -66,7 +68,9 @@ public void init() {
 	  			// send key events to this component!
   				focusComponent.requestFocusInWindow();
 		  	
-			setVisible(true);
+			if (autoShowDialog) {
+				setVisible(true);
+			}
 		}
  	});
   }
@@ -107,5 +111,7 @@ public void init() {
   	this.getContentPane().add(buttons);
   }
   
-
+  public void dontAutoShowDialog() {
+	  autoShowDialog = false;
+  }
 }

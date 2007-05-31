@@ -17,8 +17,8 @@ public class LeftZigZag extends Piece{
 			{{false, true},
 		     {true, true},
 		     {true, false}}
-		 };			
-		pieceShape = arrayRotations[0];
+		 };
+		
 		pieceColor = Color.RED;
 	}
 }
