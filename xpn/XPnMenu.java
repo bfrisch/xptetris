@@ -29,8 +29,9 @@ public class XPnMenu extends javax.swing.JMenuBar {
 			if (!items[i].equals("|")) {
 				JMenuItem item = new JMenuItem(items[i], accell[i]);
 				item.addActionListener(printListener);
-				item.setAccelerator(KeyStroke.getKeyStroke(accell[i],
-					Toolkit.getDefaultToolkit(  ).getMenuShortcutKeyMask(  ), false));
+				if (accell[i] != ' ')
+					item.setAccelerator(KeyStroke.getKeyStroke(accell[i],
+							Toolkit.getDefaultToolkit(  ).getMenuShortcutKeyMask(  ), false));
 				tempMenu.add(item);
 			}
 			else {
@@ -93,5 +94,9 @@ public class XPnMenu extends javax.swing.JMenuBar {
 		   }
 	   }
 	   return tempMenu;
+   }
+   
+   public JFrame getParentFrame() {
+	   return (JFrame) this.getRootPane().getParent();
    }
 }
