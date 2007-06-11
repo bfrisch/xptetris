@@ -25,6 +25,8 @@ public class XPnComponent extends JComponent {
 	  public void onMouseReleased(int x, int y) { }
 	  public void onKeyPressed(KeyEvent e, int keyCode, char keyChar) { }
 	  public void onResized() { }
+	  public void onFocusGained() { }
+	  public void onFocusLost() { }
 	  
 	  protected void addEventListeners() {
 	    // add actions in response to mouse events
@@ -65,11 +67,11 @@ public class XPnComponent extends JComponent {
 	    
 	    this.addFocusListener(new FocusListener() {
 	    	public void focusGained(FocusEvent e) {
-	    		
+	    		onFocusGained();
 	    	}
 	    	
 	    	public void focusLost(FocusEvent e) {
-	    		
+	    		onFocusLost();
 	    	}
 	    });
 	  }
