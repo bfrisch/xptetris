@@ -2,7 +2,7 @@ package pieces;
 
 /**
  * @author Benjamin Frisch
- * @version 0.1 Alpha 5
+ * @version 0.9 Alpha 7
  */
 
 import java.awt.Color;
@@ -26,12 +26,16 @@ public abstract class Piece {
 	
 	
 // Piece Painting Methods
-	public void paint(int boardX, int boardY, int boardWidth, int boardHeight, int offset, Graphics page) {
+	public void paint(int squareSideLen, int boardX, int boardY, int offset, Graphics page) {
+		int usedBoxX = boardX;
+		int usedBoxY = boardY;
+		
 		for (int row = 0; row < getPieceShape().length; row++) {
 			for (int col = 0; col < getPieceShape()[0].length; col++) {
 				if (getPieceShape()[row][col] == true) {
 					page.setColor(pieceColor);
-					page.fillRect((col + pieceTopCol)*(boardWidth/board[0].length) + boardX + offset,(row + pieceTopRow)*(boardHeight/board.length) + offset + boardY, (boardWidth/board[0].length) - (offset*2),(boardHeight/board.length) - (offset*2));
+					
+					page.fillRect((col + pieceTopCol)*(squareSideLen) + usedBoxX + offset,(row + pieceTopRow)*(squareSideLen) + offset + usedBoxY, (squareSideLen) - (offset*2),(squareSideLen) - (offset*2));
 				}
 			}
 		}
@@ -52,11 +56,58 @@ public abstract class Piece {
 // End Piece Painting Methods
 
 // Piece Rotation and Game Status
-	public void rotate() {
-		rotationNum++;
-		if (rotationNum == arrayRotations.length) rotationNum = 0;
-		int lastRotationNum =rotationNum - 1;
-		if (lastRotationNum < 0) lastRotationNum = arrayRotations.length;
+	public void rotateClockwise() {
+		if (rotationNum < arrayRotations.length - 1) {
+			if (pieceCanRotateTo(rotationNum + 1)) {
+				setRotatedTopRowCol(rotationNum + 1);
+				rotationNum++;
+			}
+		}
+		else {
+			if (pieceCanRotateTo(0)) {
+				setRotatedTopRowCol(0);
+				rotationNum = 0;
+			}
+		}
+	}
+	
+	public void rotateCounterClockwise() {
+		if (rotationNum > 0) {
+			if (pieceCanRotateTo(rotationNum - 1)) {
+				setRotatedTopRowCol(rotationNum - 1);
+				rotationNum--;
+			}
+		}
+		else {
+			if (pieceCanRotateTo(arrayRotations.length - 1)) {
+				setRotatedTopRowCol(arrayRotations.length - 1);
+				rotationNum = arrayRotations.length - 1;
+			}
+		}
+	}
+
+	private boolean pieceCanRotateTo(int rotationNum) {
+		if (pieceTopCol > board[pieceTopRow].length - getRotationMaxCols(rotationNum)) {
+			return pieceCanMoveTo(arrayRotations[rotationNum], pieceTopRow, board[pieceTopRow].length - getRotationMaxCols(rotationNum));
+		}
+		else {
+			return pieceCanMoveTo(arrayRotations[rotationNum], pieceTopRow, pieceTopCol);
+		}
+	}
+	
+	private void setRotatedTopRowCol(int rotationNum) {
+		if (pieceTopCol > board[pieceTopRow].length - getRotationMaxCols(rotationNum))
+			pieceTopCol = board[pieceTopRow].length - getRotationMaxCols(rotationNum); 
+	}
+	
+	private int getRotationMaxCols(int rotationNum) {
+		int pieceCols = 0;
+		for (int r = 0; r < arrayRotations[rotationNum].length; r++) {
+			if (arrayRotations[rotationNum][r].length - 1> pieceCols) {
+				pieceCols = arrayRotations[rotationNum][r].length; 
+			}
+		}
+		return pieceCols;
 	}
 
 	public boolean gameOver() {

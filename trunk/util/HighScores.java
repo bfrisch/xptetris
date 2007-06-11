@@ -2,19 +2,21 @@ package util;
 
 import java.util.*;
 import javax.swing.*;
+
+
+import java.awt.Toolkit;
 import java.io.*;
 
-import xpn.XPnCenteredLabel;
-import xpn.XPnDialog;
+import xpn.*;
 
 /**
  * @author Benjamin Frisch
- * @version 0.1 Alpha 2
+ * @version 0.9 Alpha 7
  */
+
 public class HighScores {	
 	private static TreeSet highScores = null;
 	private static int numScores = 0;
-	//private static final HighScoreWindow HighScoreWindow = new HighScoreWindow();
 	private static final int maxNumScores = 10;
 	
 	public static void add(String name, int score) {
@@ -23,7 +25,7 @@ public class HighScores {
 		writeScores();
 	}
 	public static void clearAll() {
-		highScores.removeAll(highScores);
+		highScores = new TreeSet();
 		numScores = 0;
 		writeScores();
 	}
@@ -33,45 +35,47 @@ public class HighScores {
 	}
 	
 	private static void writeScores() {
-		if (highScores.size() != 0) {
-			File dataFile = new File("highscores.xpr");
+		File dataFile = new File("highscores.xpr");
+		
+		FileWriter fw = null;
+		 
+		try {
+			dataFile.delete();
 			
-			FileWriter fw = null;
-			BufferedWriter bw = null;
-			 
-			try {
+			if (highScores.size() != 0) {
 				dataFile.createNewFile();
 			 
 				fw = new FileWriter(dataFile);
-				bw = new BufferedWriter(fw); 
 				
-				if (highScores.size() > 0) {
+				if (getMaxNumScores() > 0) {
 					int i;
 					java.util.Iterator highScoreIt = highScores.iterator();
-					for (i = 1; i <= maxNumScores; i++) {
+					ScoreData score = (ScoreData) highScoreIt.next();
+					
+					fw.write(score.getName() + "\n" + score.getScore());
+					
+					for (i = 2; i <= maxNumScores; i++) {
 						if (highScoreIt.hasNext()) {
-							ScoreData score = (ScoreData) highScoreIt.next();
-							bw.write(score.getName());
-							bw.newLine();
-							bw.write(score.getScore());
+							score = (ScoreData) highScoreIt.next();
+							 
+							fw.write("\n" + score.getName() + "\n" + score.getScore());
 						}
 						else {
 							break;
 						}
 					}
 				}
+				//bw.flush();
 				
 				fw.close();
-				bw.close();
 			}
-			catch (IOException e) {e.getStackTrace().toString();}
-			finally {
-				try {
-					 if (fw != null) fw.close();
-					 if (bw != null) bw.close();
-				 }
-				 catch (IOException e) {System.out.println("Error!");}
-			}
+		}
+		catch (IOException e) {System.err.println(e.getStackTrace().toString());}
+		finally {
+			try {
+				 if (fw != null) fw.close();
+			 }
+			 catch (IOException e) {System.out.println("Error!");}
 		}
 	}
 	
@@ -107,13 +111,13 @@ public class HighScores {
 						 numScores++;
 						 name = null;
 					 }
-					 catch (NumberFormatException e) {}
+					 catch (NumberFormatException e) {System.err.println(e.toString());}
 				 }
 			 }
 			 fr.close();
 			 br.close();
 		 }
-		 catch (IOException e) {}
+		 catch (IOException e) {System.err.println(e.toString());}
 		 finally {
 			 try {
 				 if (fr != null) fr.close();
@@ -125,17 +129,18 @@ public class HighScores {
 	
 	public static int getLowestHighScore() {
 		ScoreData lowestHighScore = new ScoreData("", 0);
-		java.util.Iterator highScoreIt = highScores.iterator();
-		for (int i = 1; i <= maxNumScores; i++) {
-			if (highScoreIt.hasNext()) {
-				lowestHighScore = (ScoreData) highScoreIt.next();
-			}
-			else {
-				lowestHighScore = new ScoreData("", 0);
-				break;
+		if (getNumScores() > 0) {			
+			java.util.Iterator highScoreIt = highScores.iterator();
+			for (int i = 1; i <= maxNumScores; i++) {
+				if (highScoreIt.hasNext()) {
+					lowestHighScore = (ScoreData) highScoreIt.next();
+				}
+				else {
+					lowestHighScore = new ScoreData("", 0);
+					break;
+				}
 			}
 		}
-		
 		return lowestHighScore.getScore();
 	}
 	
@@ -159,6 +164,7 @@ class HighScoreWindow extends XPnDialog {
 		this.add(new JLabel(" "));
 		this.add(new XPnCenteredLabel("High Scores"));
 		this.add(new JLabel(" "));
+		this.setIconImage(Toolkit.getDefaultToolkit().createImage(new res.ResourceLoader().getResource("TetrisIcon.png")));
 		
 		if (HighScores.getNumScores() > 0) {
 			int i;

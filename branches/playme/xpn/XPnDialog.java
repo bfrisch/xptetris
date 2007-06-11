@@ -15,7 +15,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 /**
  * @author David Kosbie
  * @author Benjamin Frisch
- * @version 0.1 Alpha 4
+ * @version 0.9 Alpha 7
  */
 
 public class XPnDialog extends JDialog {
@@ -42,6 +42,11 @@ public void init() {
   
   public XPnDialog(javax.swing.JFrame frame) {
 	  	super(frame);
+	  	privateInit();
+	  }
+  
+  public XPnDialog(javax.swing.JFrame frame, boolean modal) {
+	  	super(frame, modal);
 	  	privateInit();
 	  }
   

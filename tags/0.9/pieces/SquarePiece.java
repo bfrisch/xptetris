@@ -19,5 +19,8 @@ public class SquarePiece extends Piece{
 		pieceColor = Color.yellow;
 	}
 	
-	public void rotate() {}
+	
+	// Overridden to stop useless computations.
+	public void rotateClockwise() {}
+	public void rotateCounterClockwise() {}
 }

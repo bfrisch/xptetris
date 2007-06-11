@@ -15,7 +15,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 /**
  * @author David Kosbie
  * @author Benjamin Frisch
- * @version 0.1 Alpha 4
+ * @version 0.9 Alpha 6
  */
 
 public class XPnFrame extends JFrame {
@@ -41,7 +41,7 @@ public void init() {
   	} catch (UnsupportedLookAndFeelException ex) {
   	  System.out.println("Unable to load native look and feel");
   	}
-  	catch (Exception e) {};
+  	catch (Exception e) {}
     Container cp = this.getContentPane();
   	cp.setBackground(Color.white);
 	cp.setLayout(new BoxLayout(cp,BoxLayout.Y_AXIS));

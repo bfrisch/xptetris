@@ -6,7 +6,6 @@ import javax.swing.JLabel;
  * @version 0.1 Alpha 4
  */
 
-
 public class XPnCenteredLabel extends JLabel {
 	private static final long serialVersionUID = 4596263439400590191L;
 

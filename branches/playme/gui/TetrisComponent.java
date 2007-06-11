@@ -4,15 +4,15 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
+
 import pieces.*;
 import xpn.*;
 
 import util.HighScores;
-import util.Messages;
 
 /**
  * @author Benjamin Frisch
- * @version 0.9 Alpha 5
+ * @version 0.9 Alpha 7
  */
 
 class TetrisComponent extends XPnComponent implements XPnTimerHandler {
@@ -28,12 +28,16 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	public Piece nextPiece = getRandomNextPiece();
 	private boolean gamePaused = false;
 	
+	private boolean pausedDueToLostFocus = false;
+	
+	private int numberOfNextPieces = 1;
+	
 	private XPnTimer timer = new XPnTimer(this);
 
 	public TetrisComponent() {
 		super();
 		
-		JOptionPane.showMessageDialog(this, "Welcome to " + Messages.getString("title") + " " + Messages.getString("version") + "\nEnjoy Your Game!\n\nPlanned Features: Saving and Opening Of Games, More Than 1 Next Piece Showing\nFilled Row Becomes White Before Disappearing, \n\n- Ben Frisch", Messages.getString("title") + " " + Messages.getString("version"), JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, XPnStringBundle.getString("welcomeTo") + getTitle() + "\n" + XPnStringBundle.getString("enjoy") + "\n\n" + XPnStringBundle.getString("planned"), getTitle(), JOptionPane.INFORMATION_MESSAGE);
 		
 		init();
 	}
@@ -61,33 +65,59 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	}
 	
 	public void paintComponent(Graphics page) {
-		drawBoard(getWidth()/6 + ((getWidth() % 3)/2), 10 + (((2*getWidth()) % 3)/2), 2*getWidth()/3 - ((getWidth() % 3)/2), getHeight()-20, page);
+		int widthOffset = getWidthOffset(getSquareSideLen());
+		int heightOffset = getYOffset(getSquareSideLen());
+		
 
-		nextPiece.paintAsNextPiece(2, 70, 20, 1, page);
-		piece.paint(getWidth()/6 + ((getWidth() % 3)/2), 10 + (((2*getWidth()) % 3)/2), 2*getWidth()/3 - ((getWidth() % 3)/2), getHeight()-20, offset, page);
+		drawBoard(getSquareSideLen(), widthOffset, heightOffset, page);
+
+		nextPiece.paintAsNextPiece(widthOffset/2, 70, 20, 1, page);
+		
+		piece.paint(getSquareSideLen(), widthOffset, heightOffset, offset, page);
+		
+		page.setColor(Color.black);
+		page.drawString(XPnStringBundle.getString("score") + score, widthOffset/2, 20);
+		
+		if (numberOfNextPieces == 1)
+			page.drawString(XPnStringBundle.getString("nextPiece"), widthOffset/2, 50);
+		else
+			page.drawString(XPnStringBundle.getString("nextPieces"), widthOffset/2, 50);
 	}
 	
-	public void drawBoard(int boardX, int boardY, int boardWidth, int boardHeight, Graphics page) {
+	public void drawBoard(int squareSideLen, int boardX, int boardY, Graphics page) {
 		page.setColor(boardBorder);
-		//page.drawRect(getWidth()/6, 10, 2*getWidth()/3, getHeight()-20);
 		
 		for (int row = 0; row < board.length; row++) {
-			for (int col = 0; col < board[0].length; col++) {
+			for (int col = 0; col < board[col].length; col++) {
 				page.setColor(boardBorder);
-				page.fillRect(col*(boardWidth/board[0].length) + boardX,row*(boardHeight/board.length) + boardY, boardWidth/board[0].length,boardHeight/board.length);
+				
+				page.fillRect(col*squareSideLen + boardX,row*squareSideLen + boardY, squareSideLen, squareSideLen);
+				
 				if (board[row][col] != null) {
 					page.setColor(board[row][col]);
 				}
 				else {
 					page.setColor(boardBackground);
 				}
-				page.fillRect(col*(boardWidth/board[0].length) + boardX + offset,row*(boardHeight/board.length) + offset + boardY, (boardWidth/board[0].length) - (offset*2),(boardHeight/board.length) - (offset*2));
+				 
+				page.fillRect(col*squareSideLen + boardX + offset,row*squareSideLen + offset + boardY, squareSideLen - (offset*2),squareSideLen - (offset*2));
 			}
 		}
-		
-		page.setColor(Color.black);
-		page.drawString("Score " + score, 5, 20);
-		page.drawString("Next Piece", 5, 50);
+	}
+	
+	private int getSquareSideLen() {
+		if (getHeight()/board.length < getWidth()/board.length)
+			return getHeight()/board.length;
+	
+		return getWidth()/board[0].length;
+	}
+	
+	private int getWidthOffset(int squareSideLen) {
+		return (getWidth()/6) + ((((2*getWidth())/3) - (squareSideLen*board[0].length))/2);
+	}
+	
+	private int getYOffset(int squareSideLen) {
+		return (getHeight() - squareSideLen*board.length)/2;
 	}
 	
 	public void pauseGame() {
@@ -133,18 +163,20 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 				piece.moveRight();
 				break;
 			case KeyEvent.VK_DOWN:
-				piece.fall();
+				onTimer();
 				if (!piece.isInBoard()) score+=10;
 				break;
+			case KeyEvent.VK_UP:
+				piece.rotateCounterClockwise();
+				break;
 			case KeyEvent.VK_SPACE:
-				piece.rotate();
+				piece.rotateClockwise();
 				break;
 			case KeyEvent.VK_ENTER:
 				while (!piece.isInBoard() && !piece.gameOver()) {
-					piece.fall();
+					onTimer();
 					score+=10;
 				}
-				onTimer();
 				break;
 			}
 		}
@@ -156,11 +188,11 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	
 	public void onTimer() {
 		if (gameOver() && !gamePaused) {
-			((TetrisGUI)this.getRootPane().getParent()).statusBar.setMessage("Game Over");
+			((TetrisGUI)this.getRootPane().getParent()).statusBar.setMessage(XPnStringBundle.getString("gameOver"));
 			timer.stop();
 			
 			if (HighScores.getLowestHighScore() < score || (HighScores.getNumScores() < 10 && (this.score == HighScores.getLowestHighScore()))) {
-				String name = JOptionPane.showInputDialog(this, "Congratulations! You got a high score!\nEnter your name:\n\nPress cancel to hide your high score", "Ben's XPTetris 2007", JOptionPane.QUESTION_MESSAGE);
+				String name = JOptionPane.showInputDialog(this, XPnStringBundle.getString("congrats"), getTitle(), JOptionPane.QUESTION_MESSAGE);
 				if (name != null) {
 					HighScores.add(name, score);
 					HighScores.showScores();
@@ -184,6 +216,22 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 			}
 			
 			repaint();
+		}
+	}
+	
+	public void onFocusGained() {
+		if (pausedDueToLostFocus) {
+			pauseGame();
+			((TetrisGUI) this.getRootPane().getParent()).statusBar.setMessage(XPnStringBundle.getString("playing"));
+			pausedDueToLostFocus = false;
+		}
+	}
+	
+	public void onFocusLost() {
+		if (!isPaused()) {
+			pauseGame();
+			((TetrisGUI) this.getRootPane().getParent()).statusBar.setMessage(XPnStringBundle.getString("paused"));
+			pausedDueToLostFocus = true;
 		}
 	}
 
@@ -211,9 +259,8 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		}
 	}
 	
-	public void onResized() {repaint();}
-	
-	
-
+	private String getTitle() {
+		return XPnStringBundle.getString("title") + " " + XPnStringBundle.getString("version"); 
+	}
 }
 
