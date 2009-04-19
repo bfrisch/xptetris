@@ -9,28 +9,29 @@ import pieces.*;
 import xpn.*;
 
 import util.HighScores;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author Benjamin Frisch
- * @version 0.9 Alpha 7
+ * @version 0.9 Alpha 8
  */
 
-class TetrisComponent extends XPnComponent implements XPnTimerHandler {
+class TetrisComponent extends XPnComponent implements XPnTimerHandler, java.io.Serializable {
 	private static final long serialVersionUID = -7820551496471765983L;
 	
-	public Color[][] board = new Color[20][10];
+	private Color[][] board = new Color[20][10];
 	private static final Color boardBackground = Color.lightGray,
 		boardBorder = Color.black;
 
-	public static final int offset = 1;
-	public int score = 0;
-	public Piece piece = getRandomNextPiece();
-	public Piece nextPiece = getRandomNextPiece();
+	private static final int offset = 1;
+	private int score = 0;
+	private ConcurrentLinkedQueue nextPieces = null;
 	private boolean gamePaused = false;
 	
 	private boolean pausedDueToLostFocus = false;
 	
-	private int numberOfNextPieces = 1;
+	private int numberOfNextPieces = 2;
+	private int piecesToLose = 0;
 	
 	private XPnTimer timer = new XPnTimer(this);
 
@@ -44,6 +45,8 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	
 	public void init() {
 		timer.start(500);
+		
+		initializeNextPieces();
 	}
 	
 	public void reset() {
@@ -52,12 +55,18 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		
 		board = new Color[20][10];
 		
-		piece = getRandomNextPiece();
-		nextPiece = getRandomNextPiece();
-		
 		gamePaused = false;
 		
+		initializeNextPieces();
+		
 		repaint();
+	}
+	
+	private void initializeNextPieces() {
+		nextPieces = new ConcurrentLinkedQueue();
+		
+		for (int pieceNum = 0; pieceNum <= numberOfNextPieces; pieceNum++)
+			nextPieces.add(getRandomNextPiece());
 	}
 	
 	public void doNothingOnTimer() {
@@ -70,17 +79,25 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		
 
 		drawBoard(getSquareSideLen(), widthOffset, heightOffset, page);
-
-		nextPiece.paintAsNextPiece(widthOffset/2, 70, 20, 1, page);
 		
-		piece.paint(getSquareSideLen(), widthOffset, heightOffset, offset, page);
+		java.util.Iterator it = nextPieces.iterator();
+		
+		((Piece)it.next()).paint(getSquareSideLen(), widthOffset, heightOffset, offset, page);
+		
+		int loc = 70, pieceCount = 0;
+		while (it.hasNext() && pieceCount < numberOfNextPieces) {
+			Piece next = (Piece) it.next();
+			next.paintAsNextPiece(widthOffset/2, loc, 20, 1, page);
+			loc += 20*(next.getPieceShapeRows() + 1);
+			pieceCount++;
+		}
 		
 		page.setColor(Color.black);
 		page.drawString(XPnStringBundle.getString("score") + score, widthOffset/2, 20);
 		
 		if (numberOfNextPieces == 1)
 			page.drawString(XPnStringBundle.getString("nextPiece"), widthOffset/2, 50);
-		else
+		else if (numberOfNextPieces > 1)
 			page.drawString(XPnStringBundle.getString("nextPieces"), widthOffset/2, 50);
 	}
 	
@@ -136,13 +153,13 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	}
 	
 	public boolean gameOver() {
-		return piece.gameOver();
+		return ((Piece)nextPieces.peek()).gameOver();
 	}
 	
 	public boolean isPaused() {
 		return gamePaused || gameOver();
 	}
-	  
+	
 	////////////////////////////////////////////
 	// Event Handlers
 	////////////////////////////////////////////
@@ -157,23 +174,23 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 		if (!isPaused()) {
 			switch (keyCode) {
 			case KeyEvent.VK_LEFT:
-				piece.moveLeft();
+				((Piece)nextPieces.peek()).moveLeft();
 				break;
 			case KeyEvent.VK_RIGHT:
-				piece.moveRight();
+				((Piece)nextPieces.peek()).moveRight();
 				break;
 			case KeyEvent.VK_DOWN:
 				onTimer();
-				if (!piece.isInBoard()) score+=10;
+				if (!((Piece)nextPieces.peek()).isInBoard()) score+=10;
 				break;
 			case KeyEvent.VK_UP:
-				piece.rotateCounterClockwise();
+				((Piece)nextPieces.peek()).rotateCounterClockwise();
 				break;
 			case KeyEvent.VK_SPACE:
-				piece.rotateClockwise();
+				((Piece)nextPieces.peek()).rotateClockwise();
 				break;
 			case KeyEvent.VK_ENTER:
-				while (!piece.isInBoard() && !piece.gameOver()) {
+				while (!((Piece)nextPieces.peek()).isInBoard() && !((Piece)nextPieces.peek()).gameOver()) {
 					onTimer();
 					score+=10;
 				}
@@ -184,6 +201,26 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 	
 	public xpn.XPnTimer getTimer() {
 		return timer;
+	}
+	
+	public void setNumberNextPieces(int numPieces) {
+		if (numPieces > numberOfNextPieces) {
+			for (int nextPieceNum = numberOfNextPieces; nextPieceNum < numPieces; nextPieceNum++) {
+				nextPieces.add(getRandomNextPiece());
+			}
+			
+			numberOfNextPieces = numPieces;
+		}
+		else if (numPieces < numberOfNextPieces && numPieces >= 0) {
+			piecesToLose = numberOfNextPieces - numPieces;
+			numberOfNextPieces = numPieces;
+		}
+		
+		repaint();
+	}
+	
+	public int getNumberNextPieces() {
+		return numberOfNextPieces;
 	}
 	
 	public void onTimer() {
@@ -201,18 +238,37 @@ class TetrisComponent extends XPnComponent implements XPnTimerHandler {
 			gamePaused = true;
 		}
 		if (!isPaused()) {
-			if (piece.isInBoard()) {
-				if (piece.getNumRowsFilled() > 0) {
-					XPnSound.beep();
+			if (((Piece)nextPieces.peek()).isInBoard()) {
+				if (!isFlashing) {
+					if (((Piece)nextPieces.peek()).getNumRowsFilled() > 0) {
+						if (!flashComplete) {
+							flashCount = defaultFlashCount;
+							isFlashing = true;
+						} else {
+							flashComplete = false;
+							((Piece)nextPieces.peek()).clearFilledRows();
+						}
+					}
+					
+					score += (45/((Piece)nextPieces.peek()).getPieceShapeRows()) + 20*((Piece)nextPieces.poll()).getNumRowsFilled();
+					
+					if (piecesToLose == 0) {
+						nextPieces.add(getRandomNextPiece());
+					}
+					else {
+						piecesToLose--;
+					}
+				} else {
+					flashCount--;
+					flashBoard();
+					if (flashCount <= 0) {
+						flashComplete = true;
+						isFlashing = false;
+					}
 				}
-				
-				score += (45/piece.getPieceShapeRows()) + 20*piece.getNumRowsFilled();
-				piece = nextPiece;
-				
-				nextPiece = getRandomNextPiece();
 			}
 			else {
-				piece.fall();
+				((Piece)nextPieces.peek()).fall();
 			}
 			
 			repaint();
