@@ -2,7 +2,7 @@ package pieces;
 
 /**
  * @author Benjamin Frisch
- * @version 0.9 Alpha 7
+ * @version 0.9 Alpha 9
  */
 
 import java.awt.Color;
@@ -27,15 +27,17 @@ public abstract class Piece {
 	
 // Piece Painting Methods
 	public void paint(int squareSideLen, int boardX, int boardY, int offset, Graphics page) {
-		int usedBoxX = boardX;
-		int usedBoxY = boardY;
-		
-		for (int row = 0; row < getPieceShape().length; row++) {
-			for (int col = 0; col < getPieceShape()[0].length; col++) {
-				if (getPieceShape()[row][col] == true) {
-					page.setColor(pieceColor);
-					
-					page.fillRect((col + pieceTopCol)*(squareSideLen) + usedBoxX + offset,(row + pieceTopRow)*(squareSideLen) + offset + usedBoxY, (squareSideLen) - (offset*2),(squareSideLen) - (offset*2));
+		if (!isInBoard) {
+			int usedBoxX = boardX;
+			int usedBoxY = boardY;
+			
+			for (int row = 0; row < getPieceShape().length; row++) {
+				for (int col = 0; col < getPieceShape()[0].length; col++) {
+					if (getPieceShape()[row][col] == true) {
+						page.setColor(pieceColor);
+						
+						page.fillRect((col + pieceTopCol)*(squareSideLen) + usedBoxX + offset,(row + pieceTopRow)*(squareSideLen) + offset + usedBoxY, (squareSideLen) - (offset*2),(squareSideLen) - (offset*2));
+					}
 				}
 			}
 		}
@@ -132,6 +134,7 @@ public abstract class Piece {
 					pieceHasFallen = true;
 				}
 			}
+			// Below should only be called if the piece should leave the boards borders due to a bug.
 			else {
 				addPieceToBoard();
 				clearFilledRows();
@@ -152,7 +155,7 @@ public abstract class Piece {
 	}
 
 
-	private void clearFilledRows() { 
+	public void clearFilledRows() { 
 		for (int curRow = pieceTopRow; curRow < pieceTopRow + getPieceShapeRows(); curRow++) {
 			boolean clearRow = true;
 			for (int curCol = 0; curCol < board[curRow].length; curCol++) {
@@ -161,11 +164,15 @@ public abstract class Piece {
 					break;
 				}
 			}
-			if (clearRow) {clearRow(curRow);}
+			if (clearRow) {
+				for (int curCol = 0; curCol < board[curRow].length; curCol++) {
+					board[curRow][curCol] = Color.white;
+				}
+			}
 		}
 	}
 
-	private void clearRow(int rowToClear) {
+	public void clearRow(int rowToClear) {
 		if (rowToClear > 0) {
 			for (int c = 0; c < board[0].length; c++) {
 				board[rowToClear][c] = board[rowToClear - 1][c];			
@@ -177,6 +184,8 @@ public abstract class Piece {
 				board[0][c] = null; 
 			}					
 		}
+		
+		
 	}
 
 

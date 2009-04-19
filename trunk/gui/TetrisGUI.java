@@ -2,7 +2,7 @@ package gui;
 
 /**
  * @author Benjamin Frisch
- * @version 0.9 Alpha 7
+ * @version 0.9 Alpha 9
  */
 
 import javax.swing.*;
@@ -79,6 +79,13 @@ public class TetrisGUI extends XPnFrame {
 	      	      
 	      add(makeRadioMenu(new JMenu(XPnStringBundle.getString("sound")), soundMenuItems, soundMenuAccel));
 	      
+	      String[] optionsMenuItems = {XPnStringBundle.getString("nextPiecesOpt")};
+	      char[] optionsMenuAccel = {'E'};
+	      	      
+	      add(makeMenu(new JMenu(XPnStringBundle.getString("options")), optionsMenuItems, optionsMenuAccel));
+	      
+	      	      
+	      
 	      String[] helpMenuItems = {XPnStringBundle.getString("contents"), "|", XPnStringBundle.getString("about")};
 	      char[] helpMenuAccel = {'H', ' ', 'A'};
 	      
@@ -137,6 +144,12 @@ public class TetrisGUI extends XPnFrame {
 		  else if (selection.equals(XPnStringBundle.getString("wildthing"))) {
 			  XPnSound.playMidi("wildthing.mid", res.ResourceLoader.class, true);
 		  }
+		  else if (selection.equals(XPnStringBundle.getString("nextPiecesOpt"))) {
+			String numberNextPiecesString = (String) JOptionPane.showInputDialog(this, "How many next pieces should be shown?", getTitle(), JOptionPane.QUESTION_MESSAGE, null, new String[]{"0","1", "2", "3", "4"}, new Integer(getTetrisComponent().getNumberNextPieces()).toString());
+			
+			if (numberNextPiecesString != null)
+				getTetrisComponent().setNumberNextPieces(Integer.parseInt(numberNextPiecesString));
+		  }
 		  else if (selection.equals(XPnStringBundle.getString("contents"))) {
 			  new HelpWindow(getSelf());
 		  }
@@ -159,7 +172,7 @@ class HelpWindow extends XPnDialog {
 		add(new XPnCenteredLabel(" "), java.awt.BorderLayout.SOUTH);
 		addButtons(new String[]{XPnStringBundle.getString("closeHelp")});
 		setResizable(false);
-		this.setIconImage(Toolkit.getDefaultToolkit().createImage(new res.ResourceLoader().getResource("TetrisIcon.png")));
+		//this.setIconImage(Toolkit.getDefaultToolkit().createImage(new res.ResourceLoader().getResource("TetrisIcon.png")));
 	}
 	
 	public void onButtonPressed(String label) {
@@ -172,7 +185,9 @@ class HelpWindow extends XPnDialog {
 					XPnStringBundle.getString("playingMsg3") + "\n" +
 					XPnStringBundle.getString("playingMsg4") + "\n" + 
 					XPnStringBundle.getString("playingMsg5") + "\n" +
-					XPnStringBundle.getString("playingMsg6")
+					XPnStringBundle.getString("playingMsg6") + "\n" +
+					XPnStringBundle.getString("playingMsg7") + "\n" +
+					XPnStringBundle.getString("playingMsg8")
 					, label);
 		}
 		else if (label.equals(XPnStringBundle.getString("saving"))) {

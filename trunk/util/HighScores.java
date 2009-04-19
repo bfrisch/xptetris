@@ -2,16 +2,13 @@ package util;
 
 import java.util.*;
 import javax.swing.*;
-
-
-import java.awt.Toolkit;
 import java.io.*;
 
 import xpn.*;
 
 /**
  * @author Benjamin Frisch
- * @version 0.9 Alpha 7
+ * @version 0.9 Alpha 9
  */
 
 public class HighScores {	
@@ -164,7 +161,6 @@ class HighScoreWindow extends XPnDialog {
 		this.add(new JLabel(" "));
 		this.add(new XPnCenteredLabel("High Scores"));
 		this.add(new JLabel(" "));
-		this.setIconImage(Toolkit.getDefaultToolkit().createImage(new res.ResourceLoader().getResource("TetrisIcon.png")));
 		
 		if (HighScores.getNumScores() > 0) {
 			int i;
