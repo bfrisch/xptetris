@@ -16,20 +16,20 @@ public class XPnSound {
 		Toolkit.getDefaultToolkit().beep(); 
 	}
 	
-	public static void playMidi(String resLoc) {
+	public static void playMidiFromFile(String resLoc) {
 		playMidi(new File(resLoc),false); 
 	}
 	 
-	public static void playMidi(String resLoc, boolean loop) {
+	public static void playMidiFromFile(String resLoc, boolean loop) {
 		playMidi(new File(resLoc), loop); 
 	}
 	
-	public static void playMidi(String resLoc, Class resLoader) {
-		playMidi(resLoader.getResourceAsStream(resLoc),false); 
+	public static void playMidiFromRes(String resLoc) {
+		playMidi(ClassLoader.getSystemResourceAsStream(resLoc),false); 
 	}
 	 
-	public static void playMidi(String resLoc, Class resLoader, boolean loop) {
-		playMidi(resLoader.getResourceAsStream(resLoc), loop); 
+	public static void playMidiFromRes(String resLoc, boolean loop) {
+		playMidi(ClassLoader.getSystemResourceAsStream(resLoc), loop); 
 	}	
 	
 	public static void playMidi(File fileLoc) {

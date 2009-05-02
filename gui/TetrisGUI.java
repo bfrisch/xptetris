@@ -7,7 +7,6 @@ package gui;
 
 import javax.swing.*;
 
-
 import util.*;
 import xpn.*;
 
@@ -27,7 +26,7 @@ public class TetrisGUI extends XPnFrame {
 		getContentPane().add(statusBar, java.awt.BorderLayout.SOUTH);
 		this.setMinimumSize(new Dimension(300, 300));
 		this.setSize(500, 500);
-		this.setIconImage(Toolkit.getDefaultToolkit().createImage(new res.ResourceLoader().getResource("TetrisIcon.png")));
+		this.setIconImage(Toolkit.getDefaultToolkit().createImage(XPnResourceLoader.getResource("res.TetrisIcon.png")));
 	}
   
 	public TetrisComponent getTetrisComponent() {
@@ -130,19 +129,19 @@ public class TetrisGUI extends XPnFrame {
 			  XPnSound.stopMidi();
 		  }
 		  else if (selection.equals(XPnStringBundle.getString("birthday"))) {
-			  XPnSound.playMidi("birthday.mid", res.ResourceLoader.class, true);
+			  XPnSound.playMidiFromRes("res.birthday.mid", true);
 		  }
 		  else if (selection.equals(XPnStringBundle.getString("dowadidi"))) {
-			  XPnSound.playMidi("dowadidi.mid", res.ResourceLoader.class, true);
+			  XPnSound.playMidiFromRes("res.dowadidi.mid", true);
 		  }
 		  else if (selection.equals(XPnStringBundle.getString("footloose"))) {
-			  XPnSound.playMidi("footloose.mid", res.ResourceLoader.class, true);
+			  XPnSound.playMidiFromRes("res.footloose.mid", true);
 		  }
 		  else if (selection.equals(XPnStringBundle.getString("sender"))) {
-			  XPnSound.playMidi("sender.mid", res.ResourceLoader.class, true);
+			  XPnSound.playMidiFromRes("res.sender.mid", true);
 		  }
 		  else if (selection.equals(XPnStringBundle.getString("wildthing"))) {
-			  XPnSound.playMidi("wildthing.mid", res.ResourceLoader.class, true);
+			  XPnSound.playMidiFromRes("res.wildthing.mid", true);
 		  }
 		  else if (selection.equals(XPnStringBundle.getString("nextPiecesOpt"))) {
 			String numberNextPiecesString = (String) JOptionPane.showInputDialog(this, "How many next pieces should be shown?", getTitle(), JOptionPane.QUESTION_MESSAGE, null, new String[]{"0","1", "2", "3", "4"}, new Integer(getTetrisComponent().getNumberNextPieces()).toString());
